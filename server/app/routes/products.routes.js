@@ -1,6 +1,5 @@
 module.exports = function (app) {
     const cors = require('cors');
-    const path = require('path');
     const products = require('../controllers/products.controller')
     app.use(cors());
     // All remaining requests return the React app, so it can handle routing.
@@ -9,7 +8,6 @@ module.exports = function (app) {
         res.send('Server running');
     })
 
-    app.get('/api/search/:product/:pageNumber/:nPerPage', products.findAll);
-    app.get('/api/:product/count', products.findCount);
+    //app.get('/api/search/:product/:pageNumber/:nPerPage', products.findAll);
 
 }

@@ -33,7 +33,7 @@ export function sendQuery(valueSearch) { //отправить запрос
     };
 }
 
-export function getCountAction(count) {//запросить количество элементов
+/*export function getCountAction(count) {//запросить количество элементов
     return {
         type: 'GET_COUNT',
         count: count
@@ -48,7 +48,7 @@ export function getCount(url) {//запросить количество эле�
             .then(count => dispatch(getCountAction(count.count)))
             .catch(() => 'error')
     };
-}
+}*/
 
 export function query(url) {//запрос возвращает json
     // console.log('function query(url) '+url);

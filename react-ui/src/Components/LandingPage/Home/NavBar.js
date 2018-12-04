@@ -7,8 +7,8 @@ import Button from '@material-ui/core/Button';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 const toHome = props => <Link to="/" {...props} />;
-const toAbout = props => <Link to="/about" {...props} />;
-const toIngCheck = props => <Link to="/ingrecheck" {...props} />;
+//const toAbout = props => <Link to="/about" {...props} />;
+//const toIngCheck = props => <Link to="/ingrecheck" {...props} />;
 
 const theme = createMuiTheme({
     palette: {
@@ -36,13 +36,13 @@ const NavBar = () =>
             <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul className="navbar-nav mr-auto ">
 
-                    <li className="nav-item nav-li">
+                    {/*<li className="nav-item nav-li">
                         <Button component={toIngCheck} color="primary">Проверка ингридиента</Button>
-                    </li>
+</li>
 
                     <li className="nav-item nav-li">
                         <Button component={toAbout} color="primary">О выпускном проекте</Button>
-                    </li>
+                    </li>*/}
 
                 </ul>
             </div>

@@ -1,9 +1,9 @@
 import {combineReducers} from 'redux';
-import {items, itemsHasErrored, itemsIsLoading, updateQuery, changePage, getTotalCount} from './reducer';
+import {items, itemsHasErrored, itemsIsLoading, updateQuery, changePage} from './reducer';
 
 export default combineReducers({
     items,
-    getTotalCount,
+    //getTotalCount,
     itemsHasErrored,
     changePage,
     itemsIsLoading,

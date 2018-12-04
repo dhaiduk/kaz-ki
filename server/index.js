@@ -1,63 +1,119 @@
+/**
+ * NPM Module dependencies.
+ */
 const express = require('express');
+const trackRoute = express.Router();
+const multer = require('multer');
+
+const mongodb = require('mongodb');
+const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 const path = require('path');
-const products = require('./app/controllers/products.controller')
-const bodyParser = require('body-parser');
-const cluster = require('cluster');
-const numCPUs = require('os').cpus().length;
 
-const PORT = process.env.PORT || 5000;
+/**
+ * NodeJS Module dependencies.
+ */
+const { Readable } = require('stream');
 
-// Multi-process to utilize all CPU cores
-if (cluster.isMaster) {
-    console.error(`Node cluster master ${process.pid} is running`);
+/**
+ * Create Express server && Express Router configuration.
+ */
+const app = express();
+app.use('/api/tracks', trackRoute);
 
-    // Fork workers
-    for (let i = 0; i < numCPUs; i++) {
-        cluster.fork();
+/**
+ * Connect Mongo Driver to MongoDB.
+ */
+let db;
+MongoClient.connect('mongodb://localhost/trackDB',  {useNewUrlParser: true }, (err, database) => {
+  if (err) {
+    console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
+    process.exit(1);
+  }
+  db = database;
+});
+
+/**
+ * GET /tracks/:trackID
+ */
+trackRoute.get('/:trackID', (req, res) => {
+  try {
+    var trackID = new ObjectID(req.params.trackID);
+  } catch(err) {
+    return res.status(400).json({ message: "Invalid trackID in URL parameter. Must be a single String of 12 bytes or a string of 24 hex characters" }); 
+  }
+  res.set('content-type', 'audio/mp3');
+  res.set('accept-ranges', 'bytes');
+
+  let bucket = new mongodb.GridFSBucket(db, {
+    bucketName: 'tracks'
+  });
+
+  let downloadStream = bucket.openDownloadStream(trackID);
+
+  downloadStream.on('data', (chunk) => {
+    res.write(chunk);
+  });
+
+  downloadStream.on('error', () => {
+    res.sendStatus(404);
+  });
+
+  downloadStream.on('end', () => {
+    res.end();
+  });
+});
+
+/**
+ * POST /tracks
+ */
+trackRoute.post('/', (req, res) => {
+  const storage = multer.memoryStorage()
+  const upload = multer({ storage: storage, limits: { fields: 1, fileSize: 13000000, files: 1, parts: 2 }});
+  upload.single('track')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: "Upload Request Validation Failed" });
+    } else if(!req.body.name) {
+      return res.status(400).json({ message: "No track name in request body" });
     }
+    
+    let trackName = req.body.name;
+    
+    // Covert buffer to Readable Stream
+    const readableTrackStream = new Readable();
+    readableTrackStream.push(req.file.buffer);
+    readableTrackStream.push(null);
 
-    cluster.on('exit', (worker, code, signal) => {
-        console.error(`Node cluster worker ${worker.process.pid} exited: code ${code}, signal ${signal}`);
+    let bucket = new mongodb.GridFSBucket(db, {
+      bucketName: 'tracks'
     });
 
-} else {
+    let uploadStream = bucket.openUploadStream(trackName);
+    let id = uploadStream.id;
+    readableTrackStream.pipe(uploadStream);
 
-    const app = express();
-    // parse application/x-www-form-urlencoded
-    app.use(bodyParser.urlencoded({ extended: true }))
-
-    // parse application/json
-    app.use(bodyParser.json())
-
-    // Configuring the database
-    var dbConfig = require('./config/database.config.js');
-    var mongoose = require('mongoose');
-    // Priority serve any static files.
-    //app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
-    mongoose.Promise = global.Promise;
-
-    mongoose.connect(dbConfig.url, { useNewUrlParser: true });
-
-    mongoose.connection.on('error', function () {
-        console.log('Could not connect to the database. Exiting now...');
-        process.exit();
+    uploadStream.on('error', () => {
+      return res.status(500).json({ message: "Error uploading file" });
     });
 
-    mongoose.connection.once('open', function () {
-        console.log("Successfully connected to the database");
-    })
+    uploadStream.on('finish', () => {
+      return res.status(201).json({ message: "File uploaded successfully, stored under Mongo ObjectID: " + id });
+    });
+  });
+});
+
+
 
     // Priority serve any static files.
     app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 
-    require('./app/routes/products.routes.js')(app);
+    //require('./app/routes/products.routes.js')(app);
 
     app.get('*', function (request, response) {
         response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
     });
 
-    app.listen(PORT, function () {
-        console.error(`Node cluster worker ${process.pid}: listening on port ${PORT}`);
-    });
 
-}
+app.listen(5000, () => {
+  console.log("App listening on port 5000!");
+});

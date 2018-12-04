@@ -37,14 +37,14 @@ export function updateQuery(state = '', action) {//в разделе updateQuery
 
 }
 
-export function getTotalCount(state = 0, action) {
+/*export function getTotalCount(state = 0, action) {
     switch (action.type) {
         case 'GET_COUNT':
             return action.count
         default:
             return state;
     }
-}
+}*/
 
 export function changePage(state = 1, action) {
     switch (action.type) {
