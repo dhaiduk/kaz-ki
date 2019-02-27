@@ -40,6 +40,7 @@ const CustomizedInputs = (props) => {
             autoFocus={true} //Если значение true, вход будет сфокусирован во время первого монтирования
             onChange={cbOnChange}
             //label="Введите данные"
+            defaultValue="5bfe5c749706492ac0ccb20a"
             InputProps={{//Свойства, применяемые к элементу ввода
                 disableUnderline: true,//Убираем подчеркивание
                 classes: {

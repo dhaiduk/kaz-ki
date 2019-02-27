@@ -51,7 +51,7 @@ export function getCount(url) {//запросить количество эле�
 }*/
 
 export function query(url) {//запрос возвращает json
-    // console.log('function query(url) '+url);
+    console.log('function query(url) '+url);
     return (dispatch) => {
         dispatch(itemsIsLoading(true));
 

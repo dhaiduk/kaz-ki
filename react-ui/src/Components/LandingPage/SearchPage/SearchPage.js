@@ -9,8 +9,11 @@ const SearchPage = () =>
 
     <div className='searchpage'>
         <SearchForm fire={false} />
-        <br/>
-        <ProductContainer/>
+        <br />
+        <div>
+            <audio ref="audio_tag" src="localhost:5000/api/tracks/5bfe5c749706492ac0ccb20a" controls autoPlay />
+        </div>
+        <ProductContainer />
     </div>
 
 export default SearchPage;

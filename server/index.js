@@ -1,8 +1,9 @@
 /**
- * NPM Module dependencies.
+ * Зависимости модуля NPM
  */
 const express = require('express');
 const trackRoute = express.Router();
+//Multer - это промежуточное программное обеспечение node.js для обработки multipart/form-data
 const multer = require('multer');
 
 const mongodb = require('mongodb');
@@ -13,6 +14,7 @@ const path = require('path');
 /**
  * NodeJS Module dependencies.
  */
+//Node.js потоки в браузере.
 const { Readable } = require('stream');
 
 /**
@@ -25,7 +27,7 @@ app.use('/api/tracks', trackRoute);
  * Connect Mongo Driver to MongoDB.
  */
 let db;
-MongoClient.connect('mongodb://localhost/trackDB',  {useNewUrlParser: true }, (err, database) => {
+MongoClient.connect('mongodb://localhost/trackDB',  (err, database) => {
   if (err) {
     console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
     process.exit(1);
@@ -39,8 +41,8 @@ MongoClient.connect('mongodb://localhost/trackDB',  {useNewUrlParser: true }, (e
 trackRoute.get('/:trackID', (req, res) => {
   try {
     var trackID = new ObjectID(req.params.trackID);
-  } catch(err) {
-    return res.status(400).json({ message: "Invalid trackID in URL parameter. Must be a single String of 12 bytes or a string of 24 hex characters" }); 
+  } catch (err) {
+    return res.status(400).json({ message: "Invalid trackID in URL parameter. Must be a single String of 12 bytes or a string of 24 hex characters" });
   }
   res.set('content-type', 'audio/mp3');
   res.set('accept-ranges', 'bytes');
@@ -69,16 +71,16 @@ trackRoute.get('/:trackID', (req, res) => {
  */
 trackRoute.post('/', (req, res) => {
   const storage = multer.memoryStorage()
-  const upload = multer({ storage: storage, limits: { fields: 1, fileSize: 13000000, files: 1, parts: 2 }});
+  const upload = multer({ storage: storage, limits: { fields: 1, fileSize: 13000000, files: 1, parts: 2 } });
   upload.single('track')(req, res, (err) => {
     if (err) {
       return res.status(400).json({ message: "Upload Request Validation Failed" });
-    } else if(!req.body.name) {
+    } else if (!req.body.name) {
       return res.status(400).json({ message: "No track name in request body" });
     }
-    
+
     let trackName = req.body.name;
-    
+
     // Covert buffer to Readable Stream
     const readableTrackStream = new Readable();
     readableTrackStream.push(req.file.buffer);
@@ -104,14 +106,14 @@ trackRoute.post('/', (req, res) => {
 
 
 
-    // Priority serve any static files.
-    app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
+// Priority serve any static files.
+app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 
-    //require('./app/routes/products.routes.js')(app);
+require('./app/routes/products.routes.js')(app);
 
-    app.get('*', function (request, response) {
-        response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
-    });
+app.get('*', function (request, response) {
+  response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
+});
 
 
 app.listen(5000, () => {

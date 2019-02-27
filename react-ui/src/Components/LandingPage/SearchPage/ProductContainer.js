@@ -14,9 +14,10 @@ import '../../css/Styles.css';
 class ProductContainer extends Component {
 
     componentDidMount() {//componentDidMount()	после вставки компонента в DOM	здесь можно делать асинхронные запросы, подписывать компонент на внешние события
-        const nPerPage = window.innerWidth < 600 ? 15 : 50;
+        //  const nPerPage = window.innerWidth < 600 ? 15 : 50;
         if (this.props.querySymbol !== '') {
-            let url = "/api/search/" + this.props.querySymbol + '/' + this.props.pageNumber + '/' + nPerPage;
+            // let url = "/api/search/" + this.props.querySymbol + '/' + this.props.pageNumber + '/' + nPerPage;
+            let url = "/api/tracks/"+this.props.querySymbol;
             // console.log(url);
             this.props.fetchData(url);
             //let urlCount = "/api/" + this.props.querySymbol + '/count';
@@ -27,8 +28,9 @@ class ProductContainer extends Component {
 
     componentWillReceiveProps(nextProps) {//componentWillReceiveProps(newProps)	вызывается перед обновлением свойств, что происходит при перерисовке данного компонента его родителем
         if (this.props.querySymbol !== nextProps.querySymbol || this.props.pageNumber !== nextProps.pageNumber) {
-            let nPerPage = window.innerWidth < 600 ? 15 : 50;
-            let url = "/api/search/" + nextProps.querySymbol + '/' + nextProps.pageNumber + '/' + nPerPage;
+            //let nPerPage = window.innerWidth < 600 ? 15 : 50;
+            //let url = "/api/search/" + nextProps.querySymbol + '/' + nextProps.pageNumber + '/' + nPerPage;
+            let url = "/api/tracks/5bfe5c749706492ac0ccb20a";
             this.props.fetchData(url);
             //let urlCount = "/api/" + nextProps.querySymbol + '/count';
             //this.props.fetchCount(urlCount);

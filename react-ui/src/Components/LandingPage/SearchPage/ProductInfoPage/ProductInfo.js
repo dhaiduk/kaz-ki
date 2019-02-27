@@ -21,7 +21,7 @@ class ProductInfo extends React.Component {
                 <DialogTitle>
                     <div className="row">
                         <div className="col-5">
-                            <a href={item.url} target="_blank">
+                            <a href={item.url} target="_blank" rel="noopener noreferrer">
                                 <Tooltip id={item.name} title="Посетить мою страницу" placement="right-end">
                                     <img className="img-thumbnail" src={imageUrl}
                                         style={{ width: '100%', height: 'auto' }}
